@@ -1,0 +1,278 @@
+package introsde.assignment.client;
+
+import introsde.assignment.soap.HealthProfileHistory;
+import introsde.assignment.soap.Measure;
+import introsde.assignment.soap.MeasureCreate;
+import introsde.assignment.soap.MeasureType;
+import introsde.assignment.soap.MeasureTypes;
+import introsde.assignment.soap.MeasureUpdate;
+import introsde.assignment.soap.People;
+import introsde.assignment.soap.PeopleList;
+import introsde.assignment.soap.People_Service;
+import introsde.assignment.soap.Person;
+import introsde.assignment.soap.PersonCreate;
+import introsde.assignment.soap.PersonUpdate;
+
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+public class PeopleClient {
+
+	public static String testTitle = 
+			"\n############################################################################################################\n"+
+			"#  [Test %2d]    %s\n"+
+			"#  Methods used:  %s\n"+
+			"#\n";
+	public static int testCase = 0;
+	
+	public static String personJoinTableHeader = 
+			" -----------------------------------------------------------------------------------------------------------\n"
+			+String.format(" %5s%15s%15s%15s%12s%12s%20s%10s", "ID", "First Name", "Last Name", "Birthdate", "mType", "mValue", "Date Registered", "mid")
+			+"\n -----------------------------------------------------------------------------------------------------------";
+	public static String personJoinRow = " %5d%15s%15s%15s%12s%12s%20s%10d";
+	public static String personJoinEmptyMeasureRow = " %5d%15s%15s%15s%12s%12s%20s%10s";
+	
+
+	public static String personTableHeader = 
+			" -------------------------------------------------------\n"
+			+String.format(" %5s%15s%15s%15s", "ID", "First Name", "Last Name", "Birthdate")
+			+"\n -------------------------------------------------------";
+	public static String personTableRow = "%5d%15s%15s%15s";
+
+	
+	public static String measureTypesTableHeader = 
+			" ----------------------------------\n"
+			+String.format(" %15s%15s", "Measure Type", "Value Type")
+			+"\n ----------------------------------";
+	public static String measureTypesTableRow = "%15s%15s";
+	
+	
+	public static String measureTableHeader = 
+			" ----------------------------------------------------------------\n"
+			+String.format(" %5s%20s%15s%20s", "mid", "Measure Type", "Value", "Date Registered")
+			+"\n ----------------------------------------------------------------";
+	public static String measureTableRow = "%5d%20s%15s%20s";
+	
+	public static void main(String[] args){
+		People_Service peopleService = new People_Service();
+		People peoplePort = peopleService.getPeopleImplPort();
+
+		//Print server information
+		
+		//Run test cases
+		
+		/**********************************************************************
+		 * T0:	Get all people in database
+		 */
+		System.out.println(String.format(testTitle, testCase++, 
+				"Get all people in the database, along with their current health profile. Store the first.",
+				"readPersonList()"));
+		PeopleList peopleList = peoplePort.readPersonList();
+		List<Person> people = peopleList.getPeople();
+		printPeopleWithMeasures(people);
+		
+		/**********************************************************************
+		 * T1: 	Read `first` person
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Read the `first` person again.",
+				"readPerson(Long id)"));
+		Person first = people.get(0);
+		Person repeatFirst = peoplePort.readPerson(first.getId());
+		printPersonWithMeasures(repeatFirst);
+		
+		/**********************************************************************
+		 * T2:	Update `first` person's name and verify it was changed TODO: Check why date doesn't update
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Change the `first` person's name and birthdate and check it was updated.",
+				"updatePerson(Person p)"));
+		PersonUpdate pUpdate = new PersonUpdate();
+		pUpdate.setId(first.getId());
+		pUpdate.setBirthdate(first.getBirthdate());
+		pUpdate.getBirthdate().setYear(pUpdate.getBirthdate().getYear()+1);
+		pUpdate.setFirstname(new StringBuilder(first.getFirstname()).reverse().toString());
+		pUpdate.setLastname(first.getLastname());
+		Person responseP = peoplePort.updatePerson(pUpdate);
+		System.out.println("Before:");
+		printPerson(first);
+		System.out.println("After:");
+		printPerson(responseP);
+		
+		/**********************************************************************
+		 * T3:   Read measureTypes
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Read all measure types.",
+				"readMeasureTypes()"));
+		MeasureTypes mTResponse = peoplePort.readMeasureTypes();
+		List<MeasureType> measureTypes = mTResponse.getMeasureTypes();
+		printMeasureTypes(measureTypes);
+		
+		/**********************************************************************
+		 * T4:	Read measure history
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Read all measure history of some type for `first` person.",
+				"readPersonHistory(Long id, String measureType)"));
+		String targetMeasureType = measureTypes.get(0).getMeasureType();
+		HealthProfileHistory historyResponse = peoplePort.readPersonHistory(first.getId(), targetMeasureType);
+		List<Measure> history = historyResponse.getHealthProfileHistory();
+		printMeasures(history);
+		
+		/**********************************************************************
+		 * T3:	Create person "Chuck Norris" with Health Profile TODO: ADD HEALTH PROFILE
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Create person `Chuck Norris` with Health Profile.",
+				"createPerson(Person p)"));
+		PersonCreate pCreate = new PersonCreate();
+		pCreate.setFirstname("Chuck");
+		pCreate.setLastname("Norris");
+		GregorianCalendar c = new GregorianCalendar(1940, 3, 10);
+		XMLGregorianCalendar birthdate;
+		try {
+			birthdate = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+			pCreate.setBirthdate(birthdate);
+		} catch (DatatypeConfigurationException e) {
+		}
+		Person chuck = peoplePort.createPerson(pCreate);
+		printPersonWithMeasures(chuck);
+		
+		/**********************************************************************
+		 * T4:	Create a measure for "Chuck Norris"
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Add a new measure for the newly created person (`Chuck Norris`).",
+				"savePersonMeasure(Long id, Measure m)"));
+		MeasureCreate mCreate = new MeasureCreate();
+		mCreate.setMeasureType("weight");
+		mCreate.setMeasureValue("68");
+		Measure chuckWeight = peoplePort.savePersonMeasure(chuck.getId(), mCreate);
+		printMeasure(chuckWeight);
+		
+		/**********************************************************************
+		 * T5:	Update the measure's value
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Update the measure's value.",
+				"updatePersonMeasure(Long id, Measure m)"));
+		MeasureUpdate mUpdate = new MeasureUpdate();
+		mUpdate.setMeasureType("weight");
+		mUpdate.setMeasureValue("78");
+		mUpdate.setMid(chuckWeight.getMid());
+		Measure updatedM = peoplePort.updatePersonMeasure(chuck.getId(), mUpdate);
+		printMeasure(updatedM);
+		
+		/**********************************************************************
+		 * T6:	Read measure to verify it was updated
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Re-read the measure to make sure it was updated.",
+				"readPersonMeasure(Long id, String measureType, Long mid)"));
+		Measure readUpdatedM = peoplePort.readPersonMeasure(chuck.getId(), 
+					updatedM.getMeasureType().getMeasureType(), updatedM.getMid());
+		printMeasure(readUpdatedM);
+		
+		/**********************************************************************
+		 * T7:	Delete Chuck....if that is even possible.
+		 */
+		System.out.println(String.format(testTitle, testCase++,
+				"Delete `Chuck Norris`",
+				"deletePerson(Long id), readPerson(Long id) to confirm it was deleted"));
+		peoplePort.deletePerson(chuck.getId());
+		Person checkDelete = peoplePort.readPerson(chuck.getId());
+		if(checkDelete == null){
+			System.out.println("Person with id `"+chuck.getId()+"` could not be found.");
+		}
+	}
+	
+	private static void printPeopleWithMeasures(List<Person> people){
+		System.out.println(personJoinTableHeader);
+		for(Person p: people){
+			printPersonWithMeasuresRow(p);
+		}
+		System.out.println("");
+	}
+	
+	private static void printPerson(Person p){
+		String firstname = p.getFirstname();
+		String lastname = p.getLastname();
+		Long id = p.getId();
+		XMLGregorianCalendar cal = p.getBirthdate();
+		SimpleDateFormat mFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		mFormatter.setTimeZone(cal.toGregorianCalendar().getTimeZone());
+		formatter.setTimeZone(cal.toGregorianCalendar().getTimeZone());
+		String dateString = formatter.format(cal.toGregorianCalendar().getTime());
+
+		System.out.println(personTableHeader);
+		System.out.println(String.format(personTableRow, id, firstname, lastname, dateString));
+		System.out.println("");
+	}
+	
+	private static void printPersonWithMeasures(Person p){
+		System.out.println(personJoinTableHeader);
+		printPersonWithMeasuresRow(p);	
+		System.out.println("");
+	}
+	
+	private static void printPersonWithMeasuresRow(Person p){
+		String firstname = p.getFirstname();
+		String lastname = p.getLastname();
+		Long id = p.getId();
+		XMLGregorianCalendar cal = p.getBirthdate();
+		SimpleDateFormat mFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		mFormatter.setTimeZone(cal.toGregorianCalendar().getTimeZone());
+		formatter.setTimeZone(cal.toGregorianCalendar().getTimeZone());
+		String dateString = formatter.format(cal.toGregorianCalendar().getTime());
+		if(p.getCurrentHealth() == null || p.getCurrentHealth().isEmpty()){
+			System.out.println(String.format(personJoinEmptyMeasureRow, id, firstname, lastname, dateString, "", "", "", ""));
+		} else {
+			for(Measure m : p.getCurrentHealth()){
+				String mDate = mFormatter.format(p.getBirthdate().toGregorianCalendar().getTime());
+				System.out.println(String.format(personJoinRow, id, firstname, lastname, dateString, m.getMeasureType().getMeasureType(), m.getMeasureValue(), mDate, m.getMid()));
+			}
+		}
+	}
+	
+	private static void printMeasureTypes(List<MeasureType> mTypes){
+		System.out.println(measureTypesTableHeader);
+		for(MeasureType m: mTypes){
+			String name = m.getMeasureType();
+			String valueType = m.getMeasureValueType();
+			System.out.println(String.format(measureTypesTableRow, name, valueType));
+		}
+		System.out.println("");
+	}
+	
+	private static void printMeasures(List<Measure> measures){
+		System.out.println(measureTableHeader);
+		for(Measure m: measures){
+			printMeasureRow(m);
+		}
+		System.out.println("");
+	}
+	
+	private static void printMeasure(Measure measure){
+		System.out.println(measureTableHeader);
+		printMeasureRow(measure);
+		System.out.println("");
+	}
+	
+	private static void printMeasureRow(Measure m){
+		Long mid = m.getMid();
+		String mType = m.getMeasureType().getMeasureType();
+		String mValue = m.getMeasureValue();
+		XMLGregorianCalendar cal = m.getDateRegistered();
+		SimpleDateFormat mFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		String dateReg = mFormatter.format(cal.toGregorianCalendar().getTime());
+		System.out.println(String.format(measureTableRow, mid, mType, mValue, dateReg));
+	}
+}
