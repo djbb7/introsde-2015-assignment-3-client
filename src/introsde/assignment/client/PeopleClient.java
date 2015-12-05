@@ -125,8 +125,10 @@ public class PeopleClient {
 		
 		System.out.println(String.format(testTitle, testCase++,
 				"Change the `first` person's name and birthdate and check it was updated.",
-				"updatePerson(Person<id:"+pUpdate.getId()+",firstname:"+pUpdate.getFirstname()
-				+", lastname:"+pUpdate.getLastname()+", birthdate:>"+pUpdate.getBirthdate()+")",
+				"updatePerson(Person<id: "+pUpdate.getId()+
+				",firstname: "+pUpdate.getFirstname()+
+				", lastname: "+pUpdate.getLastname()+
+				", birthdate: "+complexBirthdateToString(pUpdate.getBirthdate())+">)",
 				"#3"));
 		System.out.println("Before:");
 		printPerson(first);
@@ -183,7 +185,10 @@ public class PeopleClient {
 		Person chuck = peoplePort.createPerson(pCreate);
 		System.out.println(String.format(testTitle, testCase++,
 				"Create person `Chuck Norris` with Health Profile.",
-				"createPerson(Person<firstname:Chuck, lastname:Norris, birthdate:03/10/1940, currentHealth: Measure<type: "
+				"createPerson(Person<firstname: "+pCreate.getFirstname()
+				+", lastname: "+pCreate.getLastname()
+				+", birthdate: "+complexBirthdateToString(pCreate.getBirthdate())
+				+", currentHealth: Measure<type: "
 				+mCreate.getMeasureType()+", value: "+mCreate.getMeasureValue()+"> >)",
 				"#4"));
 		printPersonWithMeasures(chuck);
@@ -330,5 +335,10 @@ public class PeopleClient {
 		SimpleDateFormat mFormatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
 		String dateReg = mFormatter.format(cal.toGregorianCalendar().getTime());
 		System.out.println(String.format(measureTableRow, mid, mType, mValue, dateReg));
+	}
+	
+	private static String complexBirthdateToString(XMLGregorianCalendar greg){
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		return formatter.format(greg.toGregorianCalendar().getTime());
 	}
 }
