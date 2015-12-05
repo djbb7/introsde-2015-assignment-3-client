@@ -13,6 +13,8 @@ import introsde.assignment.soap.Person;
 import introsde.assignment.soap.PersonCreate;
 import introsde.assignment.soap.PersonUpdate;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -23,6 +25,19 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 public class PeopleClient {
 
+	public static String clientTitle = 
+			"\n############################################################################################################"+
+			"\n### IntroSDE 2015 Assignment 3 "+
+			"\n### Author:  Daniel Bruzual"+
+			"\n###"+
+			"\n### WSDL URL: %s"+
+			"\n###\n";
+	
+	public static String clientEnd =
+			"\n\n############################################################################################################"+
+			"\n### All tests done. Thanks for your time." +
+			"\n############################################################################################################";
+	
 	public static String testTitle = 
 			"\n############################################################################################################\n"+
 			"#  [Test %2d]       %s\n"+
@@ -60,13 +75,21 @@ public class PeopleClient {
 	public static String measureTableRow = " %5d%20s%15s%20s";
 	
 	public static void main(String[] args){
-		People_Service peopleService = new People_Service();
+		String wsdlLocation = "http://localhost:6903/ws/people?wsdl";
+		People_Service peopleService = null;
+		try{
+			peopleService = new People_Service(new URL(wsdlLocation));
+		} catch (MalformedURLException e){
+			System.err.println("Could not connect to server. Malformed URI: "+wsdlLocation);
+			System.exit(1);
+		}
+		
 		People peoplePort = peopleService.getPeopleImplPort();
 
 		//Print server information
+		System.out.println(String.format(clientTitle, wsdlLocation));
 		
 		//Run test cases
-		
 		/**********************************************************************
 		 * T0:	Get all people in database
 		 */
@@ -90,11 +113,11 @@ public class PeopleClient {
 		printPersonWithMeasures(repeatFirst);
 		
 		/**********************************************************************
-		 * T2:	Update `first` person's name and verify it was changed TODO: Check why date doesn't update
+		 * T2:	Update `first` person's name and verify it was changed 
 		 */
 		PersonUpdate pUpdate = new PersonUpdate();
 		pUpdate.setId(first.getId());
-		pUpdate.setBirthdate(first.getBirthdate());
+		pUpdate.setBirthdate((XMLGregorianCalendar) first.getBirthdate().clone());
 		pUpdate.getBirthdate().setYear(pUpdate.getBirthdate().getYear()+1);
 		pUpdate.setFirstname(new StringBuilder(first.getFirstname()).reverse().toString());
 		pUpdate.setLastname(first.getLastname());
@@ -193,7 +216,7 @@ public class PeopleClient {
 		printMeasure(updatedM);
 		
 		/**********************************************************************
-		 * T6:	Read measure to verify it was updated TODO: Not saving, check T5
+		 * T6:	Read measure to verify it was updated
 		 */
 		Measure readUpdatedM = peoplePort.readPersonMeasure(chuck.getId(), 
 					updatedM.getMeasureType().getMeasureType(), updatedM.getMid());
@@ -220,6 +243,9 @@ public class PeopleClient {
 		if(checkDelete == null){
 			System.out.println("\tPerson with id `"+chuck.getId()+"` could not be found.");
 		}
+		
+		//All tests ready
+		System.out.println(clientEnd);
 	}
 	
 	private static void printPeopleWithMeasures(List<Person> people){
