@@ -15,7 +15,7 @@
        # The target "download-ivy" and "install-ivy" will download the ivy jar and place it in the "ivy" folder
        # 
 -->
-<project name="assignment3-client" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="introsde-2015-assignment-3-client" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<!-- PART 1: Ivy properties, download, installation and configuration -->
 	<property name="ivy.install.version" value="2.4.0-rc1" />
@@ -54,8 +54,10 @@
 	<!-- PART 2: General properties definitions -->
 	<property name="build.dir" value="build" />
 	<property name="src.dir" value="src" />
-	<property name="lib.dir" value="WebContent/WEB-INF/lib" />
+	<property name="lib.dir" value="lib" />
 	<property name="web.dir" value="." />
+    <property name="output.log" value="client.log" />
+
 
 	<!-- ================================= 
 	          target: resolve downloads the dependencies to your lib folder              
@@ -87,17 +89,7 @@
 		<echo message="${build.dir} has been created" />
 	</target>
 
-	<target name="clean">
-		<echo message="Clean has been called" />
-		<delete dir="${build.dir}" />
-		<echo message="${build.dir} has been deleted" />
-		<delete dir="${src.dir}/${xjc.package}" />
-		<echo message="${src.dir}/${xjc.package} has been deleted" />
-		<delete file="catalog.xml" />
-		<echo message="catalog.xml has been deleted" />
-	</target>
-
-	<target name="compile">
+	<target name="install" depends="init">
 		<echo message="Compile target has been called" />
 		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.path.id" includeAntRuntime="false">
 		</javac>
@@ -108,13 +100,28 @@
 		</copy>
 	</target>
 
-	<!-- make sure you have created first the WebContent folder, including a META-INF folder, WEB-INF/web.xml file and WEB-INF/lib folder --> 
-	<target name="create.war" depends="compile">
-		<war destfile="sdelab08.war" webxml="${web.dir}/WebContent/WEB-INF/web.xml">
-			<fileset dir="${web.dir}/WebContent">
-				<include name="**/*.*"/>
-			</fileset>
-			<classes dir="${build.dir}"/>
-		</war>
+    <target name="execute.client" depends="install">
+        <echo message="execute.client target has been called" />
+        <echo message="Writing output to ${output.log}" />
+        <record name="${output.log}" action="start" append="false" />
+        <java classname="introsde.assignment.client.PeopleClient" classpath="${build.dir}" fork="true">
+            <arg value="$JAVA_OPTS  -cp" />
+            <classpath>
+                <path location="build" />
+                <fileset dir="${lib.dir}">
+                    <include name="**/*.jar" />
+                    <include name="*.jar" />
+                </fileset>
+            </classpath>
+        </java>
+        <record name="${output.log}" action="stop" />
+        <echo message="" />
+        <echo message="Execution finished. Please check ${output.log} for output" />
+    </target>
+    
+    <target name="clean">
+		<echo message="Clean has been called" />
+		<delete dir="${build.dir}" />
+		<echo message="${build.dir} has been deleted" />
 	</target>
 </project>
