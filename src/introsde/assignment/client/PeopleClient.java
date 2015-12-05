@@ -74,8 +74,15 @@ public class PeopleClient {
 			+"\n ----------------------------------------------------------------";
 	public static String measureTableRow = " %5d%20s%15s%20s";
 	
+	/*
+	 * 
+	 */
 	public static void main(String[] args){
-		String wsdlLocation = "http://localhost:6903/ws/people?wsdl";
+		if(args.length == 0){
+			System.err.println("Please specify the location of the WSDL file");
+			System.exit(1);
+		}
+		String wsdlLocation = args[0];
 		People_Service peopleService = null;
 		try{
 			peopleService = new People_Service(new URL(wsdlLocation));
