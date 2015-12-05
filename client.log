@@ -3,7 +3,7 @@
      [java] ### IntroSDE 2015 Assignment 3 
      [java] ### Author:  Daniel Bruzual
      [java] ###
-     [java] ### WSDL URL: http://localhost:6903/ws/people?wsdl
+     [java] ### WSDL URL: https://introsde2015assignment3bruzual.herokuapp.com/ws/people?wsdl
      [java] ###
      [java] 
      [java] 
@@ -16,13 +16,13 @@
      [java]  -----------------------------------------------------------------------------------------------------------
      [java]     ID     First Name      Last Name      Birthdate       mType      mValue     Date Registered       mid
      [java]  -----------------------------------------------------------------------------------------------------------
-     [java]      1          ordeP       Carrezna     01/01/2000      weight          63    01/12/2015 11:59      2254
-     [java]      1          ordeP       Carrezna     01/01/2000      height         172    02/12/2015 12:00      2251
-     [java]      1          ordeP       Carrezna     01/01/2000       steps        9892    01/12/2015 11:57      2253
-     [java]      2        Gustaff          Broll     02/09/1978      weight          94    02/12/2015 12:57      2256
-     [java]      3     Palincosin          Perez     02/09/1978       steps       15432    02/12/2015 12:54      2257
-     [java]      4         Andrea          Smith     02/09/1982                                                      
-     [java]      5          Pablo          Villa     01/11/1982                                                      
+     [java]      1          Pedro       Carrezna     31/12/1992      weight          63    01/12/2015 10:59      2254
+     [java]      1          Pedro       Carrezna     31/12/1992      height         172    01/12/2015 11:00      2251
+     [java]      1          Pedro       Carrezna     31/12/1992       steps        9892    01/12/2015 10:57      2253
+     [java]      2        Gustaff          Broll     01/09/1978      weight          94    01/12/2015 10:57      2256
+     [java]      3     Palincosin          Perez     01/09/1978       steps       15432    01/12/2015 10:54      2257
+     [java]      4         Andrea          Smith     01/09/1982                                                      
+     [java]      5          Pablo          Villa     31/10/1982                                                      
      [java] 
      [java] 
      [java] ############################################################################################################
@@ -34,14 +34,14 @@
      [java]  -----------------------------------------------------------------------------------------------------------
      [java]     ID     First Name      Last Name      Birthdate       mType      mValue     Date Registered       mid
      [java]  -----------------------------------------------------------------------------------------------------------
-     [java]      1          ordeP       Carrezna     01/01/2000      weight          63    01/12/2015 11:59      2254
-     [java]      1          ordeP       Carrezna     01/01/2000      height         172    02/12/2015 12:00      2251
-     [java]      1          ordeP       Carrezna     01/01/2000       steps        9892    01/12/2015 11:57      2253
+     [java]      1          Pedro       Carrezna     31/12/1992      weight          63    01/12/2015 10:59      2254
+     [java]      1          Pedro       Carrezna     31/12/1992      height         172    01/12/2015 11:00      2251
+     [java]      1          Pedro       Carrezna     31/12/1992       steps        9892    01/12/2015 10:57      2253
      [java] 
      [java] 
      [java] ############################################################################################################
      [java] #  [Test  3]       Change the `first` person's name and birthdate and check it was updated.
-     [java] #  Methods used:   updatePerson(Person<id: 1,firstname: Pedro, lastname: Carrezna, birthdate: 01/01/2001>)
+     [java] #  Methods used:   updatePerson(Person<id: 1,firstname: ordeP, lastname: Carrezna, birthdate: 01/01/1994>)
      [java] #  Method numbers: #3
      [java] #  Response: 
      [java] 
@@ -49,13 +49,13 @@
      [java]  -------------------------------------------------------
      [java]     ID     First Name      Last Name      Birthdate
      [java]  -------------------------------------------------------
-     [java]      1          ordeP       Carrezna     01/01/2000
+     [java]      1          Pedro       Carrezna     31/12/1992
      [java] 
      [java] After:
      [java]  -------------------------------------------------------
      [java]     ID     First Name      Last Name      Birthdate
      [java]  -------------------------------------------------------
-     [java]      1          Pedro       Carrezna     01/01/2001
+     [java]      1          ordeP       Carrezna     31/12/1993
      [java] 
      [java] 
      [java] ############################################################################################################
@@ -104,48 +104,48 @@
      [java]  -----------------------------------------------------------------------------------------------------------
      [java]     ID     First Name      Last Name      Birthdate       mType      mValue     Date Registered       mid
      [java]  -----------------------------------------------------------------------------------------------------------
-     [java]   4258          Chuck         Norris     10/04/1940       steps         166    05/12/2015 10:49      3715
+     [java]   4251          Chuck         Norris     09/04/1940       steps         166    05/12/2015 10:45      3701
      [java] 
      [java] 
      [java] ############################################################################################################
      [java] #  [Test  7]       Add a new measure for the newly created person (`Chuck Norris`).
-     [java] #  Methods used:   savePersonMeasure(4258, Measure<type: weight, value: 68>)
+     [java] #  Methods used:   savePersonMeasure(4251, Measure<type: weight, value: 68>)
      [java] #  Method numbers: #9
      [java] #  Response: 
      [java] 
      [java]  ----------------------------------------------------------------
      [java]    mid        Measure Type          Value     Date Registered
      [java]  ----------------------------------------------------------------
-     [java]   3716              weight             68    05/12/2015 10:49
+     [java]   3702              weight             68    05/12/2015 11:45
      [java] 
      [java] 
      [java] ############################################################################################################
      [java] #  [Test  8]       Update the measure's value.
-     [java] #  Methods used:   updatePersonMeasure(4258, Measure<mid: 3716, type: weight, value: 78>)
+     [java] #  Methods used:   updatePersonMeasure(4251, Measure<mid: 3702, type: weight, value: 78>)
      [java] #  Method numbers: #10
      [java] #  Response: 
      [java] 
      [java]  ----------------------------------------------------------------
      [java]    mid        Measure Type          Value     Date Registered
      [java]  ----------------------------------------------------------------
-     [java]   3716              weight             78    05/12/2015 10:49
+     [java]   3702              weight             78    05/12/2015 11:45
      [java] 
      [java] 
      [java] ############################################################################################################
      [java] #  [Test  9]       Re-read the measure to make sure it was updated.
-     [java] #  Methods used:   readPersonMeasure(4258, weight, 3716)
+     [java] #  Methods used:   readPersonMeasure(4251, weight, 3702)
      [java] #  Method numbers: #8
      [java] #  Response: 
      [java] 
      [java]  ----------------------------------------------------------------
      [java]    mid        Measure Type          Value     Date Registered
      [java]  ----------------------------------------------------------------
-     [java]   3716              weight             78    05/12/2015 12:00
+     [java]   3702              weight             78    05/12/2015 01:00
      [java] 
      [java] 
      [java] ############################################################################################################
      [java] #  [Test 10]       Delete `Chuck Norris`
-     [java] #  Methods used:   deletePerson(4258), readPerson(4258) to confirm it was deleted
+     [java] #  Methods used:   deletePerson(4251), readPerson(4251) to confirm it was deleted
      [java] #  Method numbers: #5
      [java] #  Response: 
      [java] 
@@ -153,7 +153,7 @@
      [java] 	Person deleted successfully
      [java] 
      [java] Double-checking that person is not in db...
-     [java] 	Person with id `4258` could not be found.
+     [java] 	Person with id `4251` could not be found.
      [java] 
      [java] 
      [java] ############################################################################################################
