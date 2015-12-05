@@ -1,6 +1,6 @@
 # introsde-2015-assignment-3-client
 
-This project defines a client for connecting to and using a SOAP web service defined here ([introsde-assignment-3-server](https://github.com/djbb7/introsde-2015-assignment-3-server).
+This project defines a client for connecting to and using a SOAP web service defined here ([introsde-assignment-3-server](https://github.com/djbb7/introsde-2015-assignment-3-server)).
 
 The client tests all functionality of the Web Service in a specific order to make sure they are doing what is expected.
 
